@@ -1,6 +1,9 @@
 import { lerp } from "../utils/lerp";
+import { End, Start } from "../types";
 
 const INFINITY = 1000000;
+
+export type RoadBoarder = [Start, End];
 
 export class Road {
   private readonly left: number;
@@ -8,7 +11,7 @@ export class Road {
   private readonly top: number = -INFINITY;
   private readonly bottom: number = INFINITY;
 
-  private readonly borders: { x: number; y: number }[][];
+  private readonly borders: RoadBoarder[];
 
   constructor(
     private x: number,
@@ -60,5 +63,9 @@ export class Road {
       ctx.lineTo(border[1].x, border[1].y);
       ctx.stroke();
     });
+  }
+
+  public getBorders() {
+    return this.borders;
   }
 }

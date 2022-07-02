@@ -26,7 +26,7 @@ function App() {
       return;
     }
 
-    car.update();
+    car.update(road.getBorders());
 
     canvasRef.current.height = window.innerHeight;
 

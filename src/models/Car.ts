@@ -1,13 +1,17 @@
 import { Controls } from "./Controls";
+import { Sensor } from "./Sensor";
+import { RoadBoarder } from "./Road";
 
 export class Car {
   private readonly controls = new Controls();
-  private speed: number = 0;
-  private readonly acceleration: number = 0.2;
+  private readonly sensor: Sensor = new Sensor(this);
 
+  private speed: number = 0;
+  private angle: number = 0;
+
+  private readonly acceleration: number = 0.2;
   private readonly maxSpeed: number = 3;
   private readonly friction: number = 0.05;
-  private angle: number = 0;
 
   constructor(
     private x: number,
@@ -24,10 +28,13 @@ export class Car {
     ctx.beginPath();
     ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
     ctx.restore();
+
+    this.sensor.draw(ctx);
   }
 
-  public update() {
+  public update(roadBorders: RoadBoarder[]) {
     this.moveCar();
+    this.sensor.update(roadBorders);
   }
 
   private moveCar(): void {
@@ -73,5 +80,13 @@ export class Car {
 
   public getY(): number {
     return this.y;
+  }
+
+  public getX(): number {
+    return this.x;
+  }
+
+  public getAngle(): number {
+    return this.angle;
   }
 }
