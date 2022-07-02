@@ -56,7 +56,7 @@ export class Car {
     if (Math.abs(this.speed) < this.friction) {
       this.speed = 0;
     }
-    if (this.speed != 0) {
+    if (this.speed !== 0) {
       const flip = this.speed > 0 ? 1 : -1;
 
       if (this.controls.left) {
