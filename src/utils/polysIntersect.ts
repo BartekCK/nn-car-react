@@ -1,9 +1,8 @@
-import { RoadBoarder } from "../models/Road";
 import { getIntersection } from "./getIntersection";
 
 export function polysIntersect(
   polygon: { x: number; y: number }[],
-  roadBorder: RoadBoarder
+  roadBorder: { x: number; y: number }[]
 ) {
   for (let i = 0; i < polygon.length; i++) {
     for (let j = 0; j < roadBorder.length; j++) {

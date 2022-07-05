@@ -4,8 +4,15 @@ export class Controls {
   private _up: boolean = false;
   private _down: boolean = false;
 
-  constructor() {
-    this.addKeyboardListeners();
+  constructor(controlType: "DUMMY" | "KEYS") {
+    switch (controlType) {
+      case "DUMMY":
+        this._up = true;
+        break;
+      case "KEYS":
+        this.addKeyboardListeners();
+        break;
+    }
   }
 
   private addKeyboardListeners(): void {

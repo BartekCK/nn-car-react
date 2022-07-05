@@ -8,6 +8,7 @@ function App() {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
   const roadRef = React.useRef<Road | null>(null);
   const carRef = React.useRef<Car | null>(null);
+  const trafficRef = React.useRef<Car[]>([]);
 
   useAnimationFrame(() => {
     if (!canvasRef || !canvasRef.current) {
@@ -15,6 +16,7 @@ function App() {
     }
     const road = roadRef.current;
     const car = carRef.current;
+    const traffic = trafficRef.current;
 
     if (!car || !road) {
       return;
@@ -26,7 +28,10 @@ function App() {
       return;
     }
 
-    car.update(road.getBorders());
+    traffic.forEach((singleCar) => {
+      singleCar.update(road.getBorders(), []);
+    });
+    car.update(road.getBorders(), traffic);
 
     canvasRef.current.height = window.innerHeight;
 
@@ -34,7 +39,10 @@ function App() {
     ctx.translate(0, -car.getY() + canvasRef.current.height * 0.7);
 
     road.draw(ctx);
-    car.draw(ctx);
+    traffic.forEach((singleCar) => {
+      singleCar.draw(ctx, "red");
+    });
+    car.draw(ctx, "blue");
 
     ctx.restore();
   });
@@ -51,7 +59,17 @@ function App() {
       canvasRef.current.width * 0.9,
       3
     );
-    carRef.current = new Car(roadRef.current.getLaneCenter(1), 100, 30, 50);
+    carRef.current = new Car(
+      roadRef.current.getLaneCenter(1),
+      100,
+      30,
+      50,
+      "KEYS"
+    );
+
+    trafficRef.current = [
+      new Car(roadRef.current.getLaneCenter(1), -100, 30, 50, "DUMMY", 2),
+    ];
   }, []);
 
   return (

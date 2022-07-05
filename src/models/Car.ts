@@ -4,14 +4,13 @@ import { RoadBoarder } from "./Road";
 import { polysIntersect } from "../utils/polysIntersect";
 
 export class Car {
-  private readonly controls = new Controls();
-  private readonly sensor: Sensor = new Sensor(this);
+  private readonly controls: Controls;
+  private readonly sensor: Sensor | undefined;
 
   private speed: number = 0;
   private angle: number = 0;
 
   private readonly acceleration: number = 0.2;
-  private readonly maxSpeed: number = 3;
   private readonly friction: number = 0.05;
   private polygon: { x: number; y: number }[] = [];
   private damaged: boolean = false;
@@ -20,14 +19,21 @@ export class Car {
     private x: number,
     private y: number,
     private readonly width: number,
-    private readonly height: number
-  ) {}
+    private readonly height: number,
+    controlType: "DUMMY" | "KEYS",
+    private readonly maxSpeed: number = 3
+  ) {
+    if (controlType !== "DUMMY") {
+      this.sensor = new Sensor(this);
+    }
+    this.controls = new Controls(controlType);
+  }
 
-  public draw(ctx: CanvasRenderingContext2D) {
+  public draw(ctx: CanvasRenderingContext2D, color: string) {
     if (this.damaged) {
       ctx.fillStyle = "gray";
     } else {
-      ctx.fillStyle = "black";
+      ctx.fillStyle = color;
     }
     ctx.beginPath();
     ctx.moveTo(this.polygon[0].x, this.polygon[0].y);
@@ -36,16 +42,20 @@ export class Car {
     }
     ctx.fill();
 
-    this.sensor.draw(ctx);
+    if (this.sensor) {
+      this.sensor.draw(ctx);
+    }
   }
 
-  public update(roadBorders: RoadBoarder[]) {
+  public update(roadBorders: RoadBoarder[], traffic: Car[]) {
     if (!this.damaged) {
       this.moveCar();
       this.polygon = this.createPolygon();
-      this.damaged = this.assessDamage(roadBorders);
+      this.damaged = this.assessDamage(roadBorders, traffic);
     }
-    this.sensor.update(roadBorders);
+    if (this.sensor) {
+      this.sensor.update(roadBorders, traffic);
+    }
   }
 
   private moveCar(): void {
@@ -129,13 +139,23 @@ export class Car {
     return points;
   }
 
-  private assessDamage(roadBorders: RoadBoarder[]): boolean {
+  private assessDamage(roadBorders: RoadBoarder[], traffic: Car[]): boolean {
     for (let i = 0; i < roadBorders.length; i++) {
       if (polysIntersect(this.polygon, roadBorders[i])) {
         return true;
       }
     }
 
+    for (let i = 0; i < traffic.length; i++) {
+      if (polysIntersect(this.polygon, traffic[i].getPolygon())) {
+        return true;
+      }
+    }
+
     return false;
+  }
+
+  public getPolygon(): { x: number; y: number }[] {
+    return this.polygon;
   }
 }
